@@ -31,5 +31,20 @@ class TCPServer {
     } 
 } 
  
+// Client 1 send connection request-- Server creats connection and logs name of user
 
+//Client 1 sends MATH request-- Server logs request--Server sends answer
+
+
+//Client 2 send connection request-- Server creats connection and logs name of user
+//Client 2 sends MATH request-- Server logs request--Server sends answer
            
+
+//Client 1 sends MATH request-- Server logs request--Server sends answer
+//Client 1 sends MATH request-- Server logs request--Server sends answer
+
+//Client 2 closes connection--Server closes connection--Server logs closeing
+
+
+//LOGS
+// [TIME STANP]: ACTION TYPE-- USER INFO

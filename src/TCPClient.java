@@ -32,4 +32,19 @@ class TCPClient {
           } 
       } 
 
-        
+//how do we send name in initial  connection request
+//Creates connection and sends name to server
+
+// Client 1 sends math calculation
+
+//Client 2 creates connection
+//Client 2 sends math calculation
+
+//Client 1 sends math calculation
+
+//Client 1 closes connection
+
+
+// CLOSE--
+// NAME--
+// MATH--
