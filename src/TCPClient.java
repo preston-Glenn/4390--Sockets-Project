@@ -1,5 +1,6 @@
 import java.io.*; 
-import java.net.*; 
+import java.net.*;
+import java.util.Scanner; 
 class TCPClient { 
 
     public static void main(String argv[]) throws Exception 
@@ -8,52 +9,48 @@ class TCPClient {
         String modifiedSentence;
         String Name;
         
-        Boolean Continue = true;
         
-        BufferedReader inFromUser = 
-          new BufferedReader(new InputStreamReader(System.in)); 
+        Scanner sc = new Scanner(System.in);  
 		System.out.println("Hello, Welcome to Preston and Payton's Calculator Client");
 		System.out.println("What is your name?");
-		Name = inFromUser.readLine(); 
+		Name = sc.nextLine(); 
 		
-        Socket clientSocket = new Socket("127.0.0.1", 6789); 
-        DataOutputStream outToServer = 
-          new DataOutputStream(clientSocket.getOutputStream()); 
-        
-        BufferedReader inFromServer = 
-                new BufferedReader(new
-                InputStreamReader(clientSocket.getInputStream())); 
-        outToServer.writeBytes("NAME--"+Name + '\n'); 
-        
-        while(Continue) {
-        	String expression; 
-        	String check = "";
-        	System.out.println("Would you like to:\nA) Enter math equation\nB) Exit");
-        	check = inFromUser.readLine();
+        try(Socket clientSocket = new Socket("127.0.0.1", 1234)){
+     // writing to server
+        	String check = null;
         	
-        	switch(check) {
-	        	case "A":
-	        		break;
-	        	default:
-	        		outToServer.writeBytes("CLOSE--\n");
-	    			Continue = false;
-	    			System.out.println("Connection Closed");
-	    			continue;
-        	}
-        	try {
-		    	System.out.println("Please enter math expression");
-		    	expression = inFromUser.readLine(); 
-				outToServer.writeBytes("MATH--"+expression + '\n'); 
-				String answer = inFromServer.readLine(); 
-				System.out.println("FROM SERVER: " + answer+"\n\n\n"); 
-        	}
-        	catch(Exception e){
-        		outToServer.writeBytes("CLOSE--\n");
-    			Continue = false;
-    			System.out.println("Connection Closed due to "+e);
-    			continue;	
-        	}	
-        }             
+ 			PrintWriter out = new PrintWriter( 
+ 					clientSocket.getOutputStream(), true); 
+
+ 			// reading from server 
+ 			BufferedReader in 
+ 				= new BufferedReader(new InputStreamReader( 
+ 						clientSocket.getInputStream()));
+ 			out.println("NAME--"+Name); 
+			out.flush();
+ 			
+
+			System.out.println("Would you like to:\nA) Enter math equation\nB) Exit");
+			check = sc.nextLine();
+ 			while("A".equalsIgnoreCase(check)) {
+ 				
+ 				
+ 				System.out.println("Please enter math expression");
+				out.println("MATH--"+ sc.nextLine()); 
+				out.flush();
+				
+				System.out.println("FROM SERVER: " + in.readLine()+"\n\n\n");
+				System.out.println("Would you like to:\nA) Enter math equation\nB) Exit");
+ 				check = sc.nextLine();
+ 			}
+ 			out.println("CLOSE--\n");
+ 			out.flush();
+ 			clientSocket.close();
+ 			sc.close();
+			System.out.println("Connection Closed");
+        }
+        
+ 
     } 
 } 
 
