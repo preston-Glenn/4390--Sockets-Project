@@ -99,7 +99,7 @@ class TCPServer {
 					}
 					// Perform client calculation.
 					else if (messageType.equals("MATH--")) {
-						log.log("SEND " + name + " Calculatation: " + message);
+						log.log("SEND " + name + " Calculation: " + message);
 						try
 						{
 							out.println(Calculator.calculate(message));
