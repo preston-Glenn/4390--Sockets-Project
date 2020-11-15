@@ -1,11 +1,11 @@
 # 4390--Sockets-Project
 
-##Description
+## Description
 This project uses TCP sockets to create a client/server system. The client will connect and create a socket. It will then send a name for the server to identify each client with. The client can then send basic operators without order of operations and precedence. The server then calculates the request and returns it to the client. In order to achieve true multiple simultaneous connections, threads were used on the server side with one thread dedicated to each client connection.
 
-##Running
+## Running
 
-###Makefile and Compilation
+### Makefile and Compilation
 The makefile will compile the project as well as remove any class files once complete.
 To compile the project cd into the project directory and type "make"
 To clean the directory remain in the project directory and type "make clean"
