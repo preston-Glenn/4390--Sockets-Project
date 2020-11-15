@@ -6,7 +6,6 @@ class TCPClient {
     public static void main(String argv[]) throws Exception 
     { 
         
-        String modifiedSentence;
         String Name;
         
         
@@ -29,9 +28,11 @@ class TCPClient {
  			out.println("NAME--"+Name); 
 			out.flush();
  			
-
+			// Get user selection.
 			System.out.println("Would you like to:\nA) Enter math equation\nB) Exit");
 			check = sc.nextLine();
+			
+			// Send server math expression and ask for input again until user disconnects
  			while("A".equalsIgnoreCase(check)) {
  				
  				
@@ -43,6 +44,8 @@ class TCPClient {
 				System.out.println("Would you like to:\nA) Enter math equation\nB) Exit");
  				check = sc.nextLine();
  			}
+ 			
+ 			// Notify server of disconnect then disconnect.
  			out.println("CLOSE--\n");
  			out.flush();
  			clientSocket.close();

@@ -1,11 +1,12 @@
 import java.io.*; 
 import java.net.*; 
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+
 
 // Server class 
 class TCPServer { 
+	
+	static Logger log = new Logger();
+	
 	public static void main(String[] args) 
 	{ 
 		ServerSocket server = null; 
@@ -26,7 +27,7 @@ class TCPServer {
 
 				// Displaying that new client is connected 
 				// to server 
-				System.out.println("New client connected"
+				log.log("New client connected "
 								+ client.getInetAddress() 
 										.getHostAddress()); 
 
@@ -43,8 +44,10 @@ class TCPServer {
 			e.printStackTrace(); 
 		} 
 		finally { 
+			// Close the server socket and exit the logger
 			if (server != null) { 
 				try { 
+					log.close();
 					server.close(); 
 				} 
 				catch (IOException e) { 
@@ -57,7 +60,7 @@ class TCPServer {
 	// ClientHandler class 
 	private static class ClientHandler implements Runnable { 
 		private final Socket clientSocket;
-		private String name; 
+		private String name = "Unnamed"; 
 
 		// Constructor 
 		public ClientHandler(Socket socket) 
@@ -81,34 +84,34 @@ class TCPServer {
 						clientSocket.getInputStream())); 
 				
 				while(true) {
+					// Read message from client
 					String clientSentence = in.readLine(); 
-					System.out.println("Recieved: " + clientSentence);
-						
+					log.log("RECIEVED FROM " + name + ": " + clientSentence);
+					
+					// parse message into type and message
 					String messageType = clientSentence.substring(0,6);
 					String message = clientSentence.substring(6);
 					
-					System.out.println(messageType);
-					System.out.println("message"+message);
+					// Set client name
 					if(messageType.equals("NAME--")) {
+						log.log("SET USERNAME: " + message);
 						this.name = message;
-						System.out.println(name);
 					}
+					// Perform client calculation.
 					else if (messageType.equals("MATH--")) {
-						// math calculation here
-						System.out.println("Enter math");
+						log.log("SEND " + name + " Calculatation: " + message);
 						try
 						{
 							out.println(Calculator.calculate(message));
 						}
 						catch (Exception e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
-							out.println("Improper input");
+							log.log("SEND " + name + ": Improper input");
 						}
 					}
+					// Break the loop
 					else {
 						// close connection
-						
 						break;
 					}
 				}
@@ -118,11 +121,12 @@ class TCPServer {
 				e.printStackTrace(); 
 			}  
 			finally { 
+				// Close the streams, socket, and log the client disconnect.
 				try { 
 					out.close(); 
 					in.close(); 
 					this.clientSocket.close(); 
-					System.out.println("Connection Closed");
+					log.log("USER " + name + " DISCONNECTED.");
 				} 
 				catch (IOException e) { 
 					e.printStackTrace(); 
