@@ -14,4 +14,4 @@ To clean the directory remain in the project directory and type "make clean"
 To Start the server type `java TCPServer` into the cmd and it will begin running. It will log its operations to both the console and a log.txt file.
 
 ### Client
-To start the client type 'java TCPClient' into the cmd and it will beginning running. Enter desired input as the prompts appear and disconnect at anytime.
+To start the client type `java TCPClient` into the cmd and it will beginning running. Enter desired input as the prompts appear and disconnect at anytime.
