@@ -1,89 +1,83 @@
 public class Calculator {
 
-    public static Double calculate(String expression){
-        if (expression == null || expression.length() == 0) {
-            return null;
-        }
-        return calc(expression.replace(" ", ""));
-    }
-    public static Double calc(String expression) {
+	public static double calculate(final String str) {
+	    return new Object() {
+	        int pos = -1, ch;
 
-        if (expression.startsWith("(") && expression.endsWith(")")) {
-            return calc(expression.substring(1, expression.length() - 1));
-        }
-        String[] containerArr = new String[]{expression};
-        double leftVal = getNextOperand(containerArr);
-        expression = containerArr[0];
-        if (expression.length() == 0) {
-            return leftVal;
-        }
-        char operator = expression.charAt(0);
-        expression = expression.substring(1);
+	        void nextChar() {
+	            ch = (++pos < str.length()) ? str.charAt(pos) : -1;
+	        }
 
-        while (operator == '*' || operator == '/') {
-            containerArr[0] = expression;
-            double rightVal = getNextOperand(containerArr);
-            expression = containerArr[0];
-            if (operator == '*') {
-                leftVal = leftVal * rightVal;
-            } else {
-                leftVal = leftVal / rightVal;
-            }
-            if (expression.length() > 0) {
-                operator = expression.charAt(0);
-                expression = expression.substring(1);
-            } else {
-                return leftVal;
-            }
-        }
-        if (operator == '+') {
-            return leftVal + calc(expression);
-        } else {
-            return leftVal - calc(expression);
-        }
+	        boolean eat(int charToEat) {
+	            while (ch == ' ') nextChar();
+	            if (ch == charToEat) {
+	                nextChar();
+	                return true;
+	            }
+	            return false;
+	        }
 
-    }
+	        double parse() {
+	            nextChar();
+	            double x = parseExpression();
+	            if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
+	            return x;
+	        }
 
-    private static double getNextOperand(String[] exp){
-        double res;
-        if (exp[0].startsWith("(")) {
-            int open = 1;
-            int i = 1;
-            while (open != 0) {
-                if (exp[0].charAt(i) == '(') {
-                    open++;
-                } else if (exp[0].charAt(i) == ')') {
-                    open--;
-                }
-                i++;
-            }
-            res = calc(exp[0].substring(1, i - 1));
-            exp[0] = exp[0].substring(i);
-        } else {
-            int i = 1;
-            if (exp[0].charAt(0) == '-') {
-                i++;
-            }
-            while (exp[0].length() > i && isNumber((int) exp[0].charAt(i))) {
-                i++;
-            }
-            res = Double.parseDouble(exp[0].substring(0, i));
-            exp[0] = exp[0].substring(i);
-        }
-        return res;
-    }
+	        // Grammar:
+	        // expression = term | expression `+` term | expression `-` term
+	        // term = factor | term `*` factor | term `/` factor
+	        // factor = `+` factor | `-` factor | `(` expression `)`
+	        //        | number | functionName factor | factor `^` factor
 
+	        double parseExpression() {
+	            double x = parseTerm();
+	            for (;;) {
+	                if      (eat('+')) x += parseTerm(); // addition
+	                else if (eat('-')) x -= parseTerm(); // subtraction
+	                else return x;
+	            }
+	        }
 
-    private static boolean isNumber(int c) {
-        int zero = (int) '0';
-        int nine = (int) '9';
-        return (c >= zero && c <= nine) || c =='.';
-    }
+	        double parseTerm() {
+	            double x = parseFactor();
+	            for (;;) {
+	                if      (eat('*')) x *= parseFactor(); // multiplication
+	                else if (eat('/')) x /= parseFactor(); // division
+	                else return x;
+	            }
+	        }
 
-    public static void main(String[] args) {
-        System.out.println(calculate("(((( -6 )))) * 9 * -1"));
-        System.out.println(calc("(-5.2+-5*-5*((5/4+2)))"));
+	        double parseFactor() {
+	            if (eat('+')) return parseFactor(); // unary plus
+	            if (eat('-')) return -parseFactor(); // unary minus
 
-    }
+	            double x;
+	            int startPos = this.pos;
+	            if (eat('(')) { // parentheses
+	                x = parseExpression();
+	                eat(')');
+	            } else if ((ch >= '0' && ch <= '9') || ch == '.') { // numbers
+	                while ((ch >= '0' && ch <= '9') || ch == '.') nextChar();
+	                x = Double.parseDouble(str.substring(startPos, this.pos));
+	            } else if (ch >= 'a' && ch <= 'z') { // functions
+	                while (ch >= 'a' && ch <= 'z') nextChar();
+	                String func = str.substring(startPos, this.pos);
+	                x = parseFactor();
+	                if (func.equals("sqrt")) x = Math.sqrt(x);
+	                else if (func.equals("sin")) x = Math.sin(Math.toRadians(x));
+	                else if (func.equals("cos")) x = Math.cos(Math.toRadians(x));
+	                else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
+	                else throw new RuntimeException("Unknown function: " + func);
+	            } else {
+	                throw new RuntimeException("Unexpected: " + (char)ch);
+	            }
+
+	            if (eat('^')) x = Math.pow(x, parseFactor()); // exponentiation
+
+	            return x;
+	        }
+	    }.parse();
+	}
 
 }

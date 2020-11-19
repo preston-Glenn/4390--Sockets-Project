@@ -86,7 +86,7 @@ class TCPServer {
 				while(true) {
 					// Read message from client
 					String clientSentence = in.readLine(); 
-					log.log("RECIEVED FROM " + name + ": " + clientSentence);
+					log.log("RECEIVED FROM " + name + ": " + clientSentence);
 					
 					// parse message into type and message
 					String messageType = clientSentence.substring(0,6);
@@ -99,7 +99,7 @@ class TCPServer {
 					}
 					// Perform client calculation.
 					else if (messageType.equals("MATH--")) {
-						log.log("SEND " + name + " Calculation: " + message);
+						log.log("SEND " + name + " Calculation: " + Calculator.calculate(message));
 						try
 						{
 							out.println(Calculator.calculate(message));
@@ -134,4 +134,6 @@ class TCPServer {
 			} 
 		} 
 	} 
+	
+	
 }
